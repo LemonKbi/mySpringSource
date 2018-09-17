@@ -286,25 +286,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 
-			if (!typeCheckOnly) {
-				markBeanAsCreated(beanName);
+			if (!typeCheckOnly) { // 是否获得用于类型检查的实例
+				markBeanAsCreated(beanName); // 把需要创建的bean 放入到进行创建的Set中
 			}
 
 			try {
 				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-				checkMergedBeanDefinition(mbd, beanName, args);
+				checkMergedBeanDefinition(mbd, beanName, args); // 检查bean是否为抽象类，如果是则报错
 
 				// Guarantee initialization of beans that the current bean depends on.
-				String[] dependsOn = mbd.getDependsOn();
+				String[] dependsOn = mbd.getDependsOn(); // 获取bean的依赖
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
-						if (isDependent(beanName, dep)) {
+						if (isDependent(beanName, dep)) { // 判断是否为循环依赖
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
+						// 在对应的 ConcurrentHashMap 中注册依赖关系 Map<String,Set>
 						registerDependentBean(dep, beanName);
 						try {
-							getBean(dep);
+							getBean(dep); // 实例 并初始化 依赖的bean
 						}
 						catch (NoSuchBeanDefinitionException ex) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
@@ -1547,7 +1548,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected void markBeanAsCreated(String beanName) {
 		if (!this.alreadyCreated.contains(beanName)) {
 			synchronized (this.mergedBeanDefinitions) {
-				if (!this.alreadyCreated.contains(beanName)) {
+				if (!this.alreadyCreated.contains(beanName)) { // 双重检查锁，在已经开始创建中插入需要进行实例的beanname
 					// Let the bean definition get re-merged now that we're actually creating
 					// the bean... just in case some of its metadata changed in the meantime.
 					clearMergedBeanDefinition(beanName);

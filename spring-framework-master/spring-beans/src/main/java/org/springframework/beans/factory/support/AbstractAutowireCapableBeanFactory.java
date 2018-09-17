@@ -455,6 +455,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * populates the bean instance, applies post-processors, etc.
 	 * @see #doCreateBean
 	 */
+	// 这个类的主要方法:创建一个bean实例，
+	// 填充bean实例、应用后处理器等。
 	@Override
 	protected Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
 			throws BeanCreationException {
@@ -467,13 +469,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Make sure bean class is actually resolved at this point, and
 		// clone the bean definition in case of a dynamically resolved Class
 		// which cannot be stored in the shared merged bean definition.
-		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+		// 确保此时bean已经被解析，先克隆一个beanDefinition 防止动态解析类的情况下不能写入在共享合并的definition中
+		Class<?> resolvedClass = resolveBeanClass(mbd, beanName); // 返回bean 的class
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
 		// Prepare method overrides.
+		// 准备方法重写
 		try {
 			mbdToUse.prepareMethodOverrides();
 		}
@@ -484,6 +488,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 让beanpostprocessor(bean后置处理器)有机会返回一个代理而不是目标bean实例
+			// TODO
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
