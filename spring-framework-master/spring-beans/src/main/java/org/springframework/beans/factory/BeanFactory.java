@@ -121,6 +121,7 @@ public interface BeanFactory {
 	 * {@code myJndiObject} is a FactoryBean, getting {@code &myJndiObject}
 	 * will return the factory, not the instance returned by the factory.
 	 */
+	// 如果带有&则返回的是工厂本身，不带则返回对应的bean
 	String FACTORY_BEAN_PREFIX = "&";
 
 

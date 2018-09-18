@@ -1,8 +1,13 @@
 package com.lemon.pojo;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+
 import java.io.Serializable;
 
-public class UserInfo implements Serializable {
+public class UserInfo implements Serializable , BeanFactoryAware , BeanNameAware {
 
 	private static final long serialVersionUID = 3026436128384352508L;
 
@@ -41,5 +46,14 @@ public class UserInfo implements Serializable {
 				", address='" + address + '\'' +
 				", age=" + age +
 				'}';
+	}
+
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		System.out.println("============= BeanFactoryAware ==========");
+	}
+
+	public void setBeanName(String name) {
+		System.out.println("============== BeanNameAware =========");
+
 	}
 }
