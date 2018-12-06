@@ -490,23 +490,23 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void onRefresh(ApplicationContext context) {
-		initStrategies(context);
+		initStrategies(context); // 初始化策略
 	}
 
 	/**
 	 * Initialize the strategy objects that this servlet uses.
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
-	protected void initStrategies(ApplicationContext context) {
-		initMultipartResolver(context);
-		initLocaleResolver(context);
-		initThemeResolver(context);
-		initHandlerMappings(context);
-		initHandlerAdapters(context);
-		initHandlerExceptionResolvers(context);
-		initRequestToViewNameTranslator(context);
-		initViewResolvers(context);
-		initFlashMapManager(context);
+	protected void initStrategies(ApplicationContext context) { // springMVC 九大组件的初试化
+		initMultipartResolver(context); // 文件上传组件
+		initLocaleResolver(context); // 本地化解析器
+		initThemeResolver(context); // 主题解析器
+		initHandlerMappings(context); // 处理映射器
+		initHandlerAdapters(context); // 处理适配器
+		initHandlerExceptionResolvers(context); // 处理异常解析
+		initRequestToViewNameTranslator(context); // view为空时根据request获取viewName
+		initViewResolvers(context); // 视图解析器
+		initFlashMapManager(context); // 可处理重定向时redirect 传递参数对象的场景（解决重定向时想要使用request里面的参数问题）
 	}
 
 	/**
@@ -593,11 +593,13 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		if (this.detectAllHandlerMappings) {
 			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+			// 从applicationContext中找到对应的mapping映射
 			Map<String, HandlerMapping> matchingBeans =
 					BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
 			if (!matchingBeans.isEmpty()) {
 				this.handlerMappings = new ArrayList<>(matchingBeans.values());
 				// We keep HandlerMappings in sorted order.
+				// 给hadnlerMapping排序
 				AnnotationAwareOrderComparator.sort(this.handlerMappings);
 			}
 		}
@@ -906,7 +908,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		logRequest(request);
+		logRequest(request); // 打印request日志
 
 		// Keep a snapshot of the request attributes in case of an include,
 		// to be able to restore the original attributes after the include.
@@ -999,28 +1001,30 @@ public class DispatcherServlet extends FrameworkServlet {
 		HandlerExecutionChain mappedHandler = null;
 		boolean multipartRequestParsed = false;
 
-		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request); // 异步请求处理器
 
 		try {
 			ModelAndView mv = null;
-			Exception dispatchException = null;
+			Exception dispatchException = null; // 异常处理
 
 			try {
-				processedRequest = checkMultipart(request);
+				processedRequest = checkMultipart(request); // 文件提交判断,并创建文件
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
+				// 获取handler 处理链，会添加上对应的handlerInterceptor，如果有cors（跨域控制）也会添加上去
 				mappedHandler = getHandler(processedRequest);
-				if (mappedHandler == null) {
+				if (mappedHandler == null) { // 找不到则返回404
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
 				// Determine handler adapter for the current request.
+				// 获取handler支持的handlerAdapter（httpRequest、handlerMethodAdapter）
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
-				String method = request.getMethod();
+				String method = request.getMethod(); // 获取http请求类型
 				boolean isGet = "GET".equals(method);
 				if (isGet || "HEAD".equals(method)) {
 					long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
@@ -1028,12 +1032,13 @@ public class DispatcherServlet extends FrameworkServlet {
 						return;
 					}
 				}
-
+				// 进行handlerInterceptor前置拦截处理
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
 				// Actually invoke the handler.
+				// 使用handlerAdapter进行对应handlerMethod方法的调用，使用了代理模式
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -1041,6 +1046,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				applyDefaultViewName(processedRequest, mv);
+				// 进行HanderInterceptors的拦截后处理postHandle
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1099,11 +1105,12 @@ public class DispatcherServlet extends FrameworkServlet {
 		boolean errorView = false;
 
 		if (exception != null) {
-			if (exception instanceof ModelAndViewDefiningException) {
+			if (exception instanceof ModelAndViewDefiningException) { // 返回找不到视图的错误
 				logger.debug("ModelAndViewDefiningException encountered", exception);
 				mv = ((ModelAndViewDefiningException) exception).getModelAndView();
 			}
 			else {
+				// 进行Exception处理链
 				Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);
 				mv = processHandlerException(request, response, handler, exception);
 				errorView = (mv != null);
@@ -1159,6 +1166,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @see MultipartResolver#resolveMultipart
 	 */
 	protected HttpServletRequest checkMultipart(HttpServletRequest request) throws MultipartException {
+		// 判断是否为文件提交请求，contentType开头为 multipart/
 		if (this.multipartResolver != null && this.multipartResolver.isMultipart(request)) {
 			if (WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class) != null) {
 				if (request.getDispatcherType().equals(DispatcherType.REQUEST)) {
@@ -1227,6 +1235,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		if (this.handlerMappings != null) {
 			for (HandlerMapping mapping : this.handlerMappings) {
+				// 获取handler 处理链，会添加上对应的handlerInterceptor，如果有cors（跨域）也会添加上去
 				HandlerExecutionChain handler = mapping.getHandler(request);
 				if (handler != null) {
 					return handler;
@@ -1251,7 +1260,7 @@ public class DispatcherServlet extends FrameworkServlet {
 					new ServletServerHttpRequest(request).getHeaders());
 		}
 		else {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404
 		}
 	}
 

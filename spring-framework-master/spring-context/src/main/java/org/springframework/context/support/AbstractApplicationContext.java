@@ -536,9 +536,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Invoke factory processors registered as beans in the context.
 				// 调用在上下文中注册为bean的工厂处理器
+				// aop的AnnotationAwareAspectJAutoProxyCreator就是在这里进行加载到BeanFactory
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 如果bean实现了BeanPostProcessor这个接口，则bean在这里进行初始化
 				registerBeanPostProcessors(beanFactory); // 注册 bean后置处理器在beanFactory中
 
 				// Initialize message source for this context.

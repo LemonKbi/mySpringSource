@@ -166,6 +166,7 @@ public class UrlPathHelper {
 			return getPathWithinApplication(request);
 		}
 		// Else, use path within current servlet mapping if applicable
+		// 在当前servlet映射中使用路径(如果适用)
 		String rest = getPathWithinServletMapping(request);
 		if (!"".equals(rest)) {
 			return rest;

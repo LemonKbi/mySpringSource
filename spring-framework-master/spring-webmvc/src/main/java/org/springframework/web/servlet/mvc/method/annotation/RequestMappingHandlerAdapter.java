@@ -778,6 +778,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
 		ModelAndView mav;
+		// 检查支持的HTTP请求类型
 		checkRequest(request);
 
 		// Execute invokeHandlerMethod in synchronized block if required.
@@ -850,23 +851,27 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
-
+		//  进行Request和response的包装
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		try {
+			// 参数转换绑定工厂，针对使用的@InitBinder添加的PropertyEditor，来对参数做各种处理
+			// 比如把入参中的Date进行格式化绑定到自定义的实体类中
 			WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+			// 获取model工厂（初始化model是对@ModelAttribute和@SessionAttribute注解的执行）
 			ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
 			ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
 			if (this.argumentResolvers != null) {
+				// 参数解析器
 				invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
 			}
-			if (this.returnValueHandlers != null) {
+			if (this.returnValueHandlers != null) { // 返回值解析器
 				invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
 			}
 			invocableMethod.setDataBinderFactory(binderFactory);
 			invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
 
-			ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+			ModelAndViewContainer mavContainer = new ModelAndViewContainer(); // 创建视图容器
 			mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
 			modelFactory.initModel(webRequest, mavContainer, invocableMethod);
 			mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
@@ -895,7 +900,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;
 			}
-
+			// 根据mavContainer上的返回值处理结果选择对应的ModelAndView
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {
@@ -949,8 +954,8 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
-		Class<?> handlerType = handlerMethod.getBeanType();
-		Set<Method> methods = this.initBinderCache.get(handlerType);
+		Class<?> handlerType = handlerMethod.getBeanType(); // 取得handlermethod的class
+		Set<Method> methods = this.initBinderCache.get(handlerType); // 缓存中存对应的class类型
 		if (methods == null) {
 			methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);

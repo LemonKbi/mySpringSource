@@ -129,7 +129,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	@Nullable
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
-
+		//获取执行Controller的函数的参数对象
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Arguments: " + Arrays.toString(args));
@@ -142,18 +142,24 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 */
 	private Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
-
+		//获取执行的具体函数的参数
 		MethodParameter[] parameters = getMethodParameters();
+		// 创建一个参数数组，保存从request解析出的方法参数
 		Object[] args = new Object[parameters.length];
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+			//获取参数值对象
 			args[i] = resolveProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {
 				continue;
 			}
+			//首先判断是否有参数解析器支持参数parameter，采用职责链的设计模式
 			if (this.argumentResolvers.supportsParameter(parameter)) {
 				try {
+					//如果参数解析器支持解析参数parameter，那么解析参数成Controller的函数需要的格式
+					// 如果参数加了@ReqeustBody注解，则使用对应的RequestResponseBodyMethodProcessor
+					// （使用了httpMessageConvert）进行解析
 					args[i] = this.argumentResolvers.resolveArgument(
 							parameter, mavContainer, request, this.dataBinderFactory);
 					continue;

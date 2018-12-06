@@ -105,11 +105,12 @@ public final class ModelFactory {
 	 */
 	public void initModel(NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod)
 			throws Exception {
-
+		//从注解了@SessionAttribute中取出保存的参数，并合并到mavContainer中
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
 		container.mergeAttributes(sessionAttributes);
+		//执行注释了@ModelAttribute的方法并将结果设置到Model
 		invokeModelAttributeMethods(request, container);
-
+		//遍历既注释了@ModelAttribute又在@SessionAttribute注释中的参数
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!container.containsAttribute(name)) {
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
@@ -188,6 +189,8 @@ public final class ModelFactory {
 	 * @param container contains the model to update
 	 * @throws Exception if creating BindingResult attributes fails
 	 */
+
+	//更新Model，包括两部分一是修改@SessionAttribute注解中值的value，二是更新Model中的值
 	public void updateModel(NativeWebRequest request, ModelAndViewContainer container) throws Exception {
 		ModelMap defaultModel = container.getDefaultModel();
 		if (container.getSessionStatus().isComplete()){

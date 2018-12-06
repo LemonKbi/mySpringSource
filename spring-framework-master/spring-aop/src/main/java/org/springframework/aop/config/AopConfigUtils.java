@@ -48,6 +48,7 @@ public abstract class AopConfigUtils {
 	/**
 	 * The bean name of the internally managed auto-proxy creator.
 	 */
+	// 内部管理的自动代理创建者的bean名称
 	public static final String AUTO_PROXY_CREATOR_BEAN_NAME =
 			"org.springframework.aop.config.internalAutoProxyCreator";
 

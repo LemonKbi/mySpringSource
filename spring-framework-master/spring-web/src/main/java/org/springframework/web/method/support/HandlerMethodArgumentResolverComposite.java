@@ -41,9 +41,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgumentResolver {
 
 	protected final Log logger = LogFactory.getLog(getClass());
-
+	//保存springMVC提供的所有的参数解析器
 	private final List<HandlerMethodArgumentResolver> argumentResolvers = new LinkedList<>();
-
+	//用于缓存已经查找过的参数解析器
 	private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
 			new ConcurrentHashMap<>(256);
 
@@ -51,6 +51,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	/**
 	 * Add the given {@link HandlerMethodArgumentResolver}.
 	 */
+	//添加参数解析器
 	public HandlerMethodArgumentResolverComposite addResolver(HandlerMethodArgumentResolver resolver) {
 		this.argumentResolvers.add(resolver);
 		return this;
@@ -86,6 +87,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	/**
 	 * Return a read-only list with the contained resolvers, or an empty list.
 	 */
+	//获取所有的参数解析器
 	public List<HandlerMethodArgumentResolver> getResolvers() {
 		return Collections.unmodifiableList(this.argumentResolvers);
 	}
@@ -104,6 +106,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	 * {@link HandlerMethodArgumentResolver}.
 	 */
 	@Override
+	//判断参数解析器是否支持参数解析
 	public boolean supportsParameter(MethodParameter parameter) {
 		return (getArgumentResolver(parameter) != null);
 	}
@@ -114,9 +117,12 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	 */
 	@Override
 	@Nullable
+	//返回参数解析器解析后的数据
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-
+		// 首先获取参数解析器，这里获取的逻辑是首先从argumentResolverCache缓存中获取该MethodParameter匹配的
+		// HandlerMethodArgumentResolver。如果为空，遍历初始化定义的那24个。
+		// 查找匹配的HandlerMethodArgumentResolver，然后添加至argumentResolverCache缓存中
 		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
 		if (resolver == null) {
 			throw new IllegalArgumentException("Unknown parameter type [" + parameter.getParameterType().getName() + "]");
@@ -128,6 +134,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	 * Find a registered {@link HandlerMethodArgumentResolver} that supports the given method parameter.
 	 */
 	@Nullable
+	//获取支持某个参数解析的参数解析器
 	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
 		if (result == null) {

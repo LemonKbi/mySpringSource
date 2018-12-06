@@ -43,6 +43,7 @@ public interface TargetSource extends TargetClassAware {
 	 */
 	@Override
 	@Nullable
+	// 本方法主要用于返回目标bean的Class类型
 	Class<?> getTargetClass();
 
 	/**
@@ -70,6 +71,8 @@ public interface TargetSource extends TargetClassAware {
 	 * @param target object obtained from a call to {@link #getTarget()}
 	 * @throws Exception if the object can't be released
 	 */
+	// Spring在完成目标bean之后会调用这个方法释放目标bean对象，对于一些需要池化的对象，这个方法是必须
+	// 要实现的，这个方法默认不进行任何处理
 	void releaseTarget(Object target) throws Exception;
 
 }

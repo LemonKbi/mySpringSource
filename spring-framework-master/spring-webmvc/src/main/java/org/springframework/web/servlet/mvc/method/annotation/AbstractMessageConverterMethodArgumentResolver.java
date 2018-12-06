@@ -164,7 +164,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	protected <T> Object readWithMessageConverters(HttpInputMessage inputMessage, MethodParameter parameter,
 			Type targetType) throws IOException, HttpMediaTypeNotSupportedException, HttpMessageNotReadableException {
 
-		MediaType contentType;
+		MediaType contentType; // 获取Content-Type
 		boolean noContentType = false;
 		try {
 			contentType = inputMessage.getHeaders().getContentType();
@@ -172,7 +172,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 		catch (InvalidMediaTypeException ex) {
 			throw new HttpMediaTypeNotSupportedException(ex.getMessage());
 		}
-		if (contentType == null) {
+		if (contentType == null) { // 如果没有指定Content-Type 则设置为 application/octet-stream
 			noContentType = true;
 			contentType = MediaType.APPLICATION_OCTET_STREAM;
 		}
@@ -190,7 +190,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 		EmptyBodyCheckingHttpInputMessage message;
 		try {
 			message = new EmptyBodyCheckingHttpInputMessage(inputMessage);
-
+			// 遍历支持的httpmessageConvert 来匹配参数
 			for (HttpMessageConverter<?> converter : this.messageConverters) {
 				Class<HttpMessageConverter<?>> converterType = (Class<HttpMessageConverter<?>>) converter.getClass();
 				GenericHttpMessageConverter<?> genericConverter =

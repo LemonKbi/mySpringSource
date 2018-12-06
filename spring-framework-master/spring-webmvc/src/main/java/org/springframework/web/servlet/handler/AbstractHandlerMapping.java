@@ -398,8 +398,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-		Object handler = getHandlerInternal(request);
-		if (handler == null) {
+		Object handler = getHandlerInternal(request); // 通过请求url匹配handlerMapping中对应的handler（handlerMethod）
+		if (handler == null) { // 如果匹配不到，返回默认处理
 			handler = getDefaultHandler();
 		}
 		if (handler == null) {
@@ -410,7 +410,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
-
+		// 获取处理器处理链，把符合定义的拦截器都加上,HandlerInterceptor可以通过继承WebMvcConfigurationSupport来添加
+		// 或者实现WebMvcConfigurer来添加
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (logger.isTraceEnabled()) {
@@ -420,7 +421,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			logger.debug("Mapped to " + executionChain.getHandler());
 		}
 
-		if (CorsUtils.isCorsRequest(request)) {
+		if (CorsUtils.isCorsRequest(request)) { // cors跨域控制，cors是特殊的handlerInterceptor
 			CorsConfiguration globalConfig = this.corsConfigurationSource.getCorsConfiguration(request);
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
 			CorsConfiguration config = (globalConfig != null ? globalConfig.combine(handlerConfig) : handlerConfig);
@@ -470,11 +471,12 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #getAdaptedInterceptors()
 	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+		// 创建一个处理器处理链类
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
-
+		// 获取请求相对路径
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request);
-		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
+		for (HandlerInterceptor interceptor : this.adaptedInterceptors) { // 遍历拦截，添加匹配的拦截器
 			if (interceptor instanceof MappedInterceptor) {
 				MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;
 				if (mappedInterceptor.matches(lookupPath, this.pathMatcher)) {
