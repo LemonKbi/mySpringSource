@@ -343,8 +343,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				checkMergedBeanDefinition(mbd, beanName, args); // 检查bean是否为抽象类，如果是则报错
 
 				// Guarantee initialization of beans that the current bean depends on.
-				// 保证当前bean所依赖的bean的初始化
-				String[] dependsOn = mbd.getDependsOn(); // 获取bean的依赖
+				 //如果这个bean有dependsOn属性。
+				String[] dependsOn = mbd.getDependsOn(); // 获取bean的DependOn依赖
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
 						if (isDependent(beanName, dep)) { // 判断是否为循环依赖
@@ -377,6 +377,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
+					//获取给定Bean的实例对象
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				} else if (mbd.isPrototype()) {
 					// It's a prototype -> create a new instance.
@@ -418,6 +419,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		// Check if required type matches the type of the actual bean instance.
+		// 对创建的Bean实例对象进行类型检查
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
 				T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
