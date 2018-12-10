@@ -831,6 +831,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
+					// 正常的单例非延迟加载的bean(非FactoryBean)
 					getBean(beanName);
 				}
 			}
