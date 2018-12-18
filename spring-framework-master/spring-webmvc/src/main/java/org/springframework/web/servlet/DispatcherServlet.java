@@ -1057,6 +1057,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+			// 处理程序选择和处理程序调用的结果，该结果要么是ModelAndView，要么是要解析到ModelAndView的异常。
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
@@ -1097,6 +1098,15 @@ public class DispatcherServlet extends FrameworkServlet {
 	/**
 	 * Handle the result of handler selection and handler invocation, which is
 	 * either a ModelAndView or an Exception to be resolved to a ModelAndView.
+	 */
+	/**
+	 * 处理程序选择和处理程序调用的结果，该结果要么是ModelAndView，要么是要解析到ModelAndView的异常。
+	 * @param request
+	 * @param response
+	 * @param mappedHandler
+	 * @param mv
+	 * @param exception
+	 * @throws Exception
 	 */
 	private void processDispatchResult(HttpServletRequest request, HttpServletResponse response,
 			@Nullable HandlerExecutionChain mappedHandler, @Nullable ModelAndView mv,
@@ -1296,9 +1306,11 @@ public class DispatcherServlet extends FrameworkServlet {
 			@Nullable Object handler, Exception ex) throws Exception {
 
 		// Success and error responses may use different content types
+		// 成功和错误响应可能使用不同的内容类型
 		request.removeAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE);
 
 		// Check registered HandlerExceptionResolvers...
+		// 检查注册的HandlerExceptironResolvers
 		ModelAndView exMv = null;
 		if (this.handlerExceptionResolvers != null) {
 			for (HandlerExceptionResolver resolver : this.handlerExceptionResolvers) {

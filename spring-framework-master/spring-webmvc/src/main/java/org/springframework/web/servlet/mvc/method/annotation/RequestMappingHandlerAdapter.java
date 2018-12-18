@@ -782,11 +782,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		checkRequest(request);
 
 		// Execute invokeHandlerMethod in synchronized block if required.
+		// 如果需要，在同步块中执行invokeHandlerMethod
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
 				Object mutex = WebUtils.getSessionMutex(session);
-				synchronized (mutex) {
+				synchronized (mutex) { // session互斥锁
 					mav = invokeHandlerMethod(request, response, handlerMethod);
 				}
 			}
@@ -895,7 +896,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				}
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
-
+			// 进行代理方法执行
 			invocableMethod.invokeAndHandle(webRequest, mavContainer);
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;

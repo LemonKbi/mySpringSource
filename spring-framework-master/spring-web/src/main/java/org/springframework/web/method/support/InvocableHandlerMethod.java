@@ -158,7 +158,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 			if (this.argumentResolvers.supportsParameter(parameter)) {
 				try {
 					//如果参数解析器支持解析参数parameter，那么解析参数成Controller的函数需要的格式
-					// 如果参数加了@ReqeustBody注解，则使用对应的RequestResponseBodyMethodProcessor
+					// 如果参数加了@ReqeustBody注解，则使用对应的 RequestResponseBodyMethodProcessor
 					// （使用了httpMessageConvert）进行解析
 					args[i] = this.argumentResolvers.resolveArgument(
 							parameter, mavContainer, request, this.dataBinderFactory);
@@ -210,7 +210,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	protected Object doInvoke(Object... args) throws Exception {
 		ReflectionUtils.makeAccessible(getBridgedMethod());
 		try {
-			return getBridgedMethod().invoke(getBean(), args);
+			return getBridgedMethod().invoke(getBean(), args); // 代理进行对应的方法执行
 		}
 		catch (IllegalArgumentException ex) {
 			assertTargetBean(getBridgedMethod(), getBean(), args);
