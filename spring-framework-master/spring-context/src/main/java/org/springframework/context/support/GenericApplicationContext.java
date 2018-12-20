@@ -259,7 +259,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @see #registerBeanDefinition
 	 */
 	@Override
-	protected final void refreshBeanFactory() throws IllegalStateException {
+	protected final void refreshBeanFactory() throws IllegalStateException { // AnnotationConfigApplicationContext继承
 		if (!this.refreshed.compareAndSet(false, true)) { // CAS设置refreshed标识为true，防止并发问题
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");

@@ -284,6 +284,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 这边有了处理单例循环依赖的逻辑，首先从 singletonObjects 的单例缓存中取对应的bean（完全实例化后的）
+		// 没有再从 earlySingletonObjects 的单例缓存中取 bean（不完全体，只是实例化后的，还没筛入属性 依赖）
+		// 最后从 singletonFactories 取对应的singletonObject，来获取bean的不完全体，
+		// 再删除再singletonFactories的缓存，把取到的bean不完全体放入earlySingletonObjects缓存中
 		Object sharedInstance = getSingleton(beanName); // 返回单例bean的对象
 		//先从缓存中取是否已经有被创建过的单态类型的Bean，对于单态模式的Bean整
 		//个IoC容器中只创建一次，不需要重复创建
@@ -297,9 +301,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 			// 获取给定bean实例的对象，对于FactoryBean，可以是bean实例本身，也可以是它创建的对象。
-			//获取给定Bean的实例对象，主要是完成FactoryBean的相关处理
-			//注意：BeanFactory是管理容器中Bean的工厂，而FactoryBean是
-			//创建创建对象的工厂Bean，两者之间有区别
+			// 获取给定Bean的实例对象，主要是完成FactoryBean的相关处理
+			// 注意：BeanFactory是管理容器中Bean的工厂，而FactoryBean是
+			// 创建创建对象的工厂Bean，两者之间有区别
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		} else { // 没有已经创建的单例bean
 			// Fail if we're already creating this bean instance:

@@ -643,6 +643,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		// 进行bean factory的刷新，例如classpathxmlApplicationContext继承了
 		//AbstractRefreshableApplicationContext ,则调用该类的方法
+		// AnnotationConfigApplicationContext 则继承了GenericApplicationConetext
 		refreshBeanFactory();
 		// 返回DefaultListableBeanFactory
 		return getBeanFactory();
@@ -682,6 +683,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
+		// 注册早期的后处理器，以便将内部bean检测为applicationlistener
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found.
