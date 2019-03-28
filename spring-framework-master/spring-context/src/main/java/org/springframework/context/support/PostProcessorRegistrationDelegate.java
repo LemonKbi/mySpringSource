@@ -237,7 +237,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// Next, register the BeanPostProcessors that implement Ordered.
 		// 这里面获取aop的postprocessor并注册到DefaultListableBeanFactory上，AnnotationAwareAspectjAutoProxyCreator
-		// 接着注册实现了Orkered的BeanPostProcessors
+		// 接着注册实现了Ordered的BeanPostProcessors
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<>();
 		for (String ppName : orderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);

@@ -129,7 +129,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		try {
 			// 再beanFactory上添加对应的beanDefinition
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			// 用于 BeanFactory 的序列化
 			beanFactory.setSerializationId(getId());
+			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
 			customizeBeanFactory(beanFactory); // 自已定义beanFactory
 			loadBeanDefinitions(beanFactory); // 进行beanDefinition的加载
 			synchronized (this.beanFactoryMonitor) {
@@ -224,9 +226,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
 		if (this.allowBeanDefinitionOverriding != null) {
+			// 是否允许 Bean 定义覆盖
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		if (this.allowCircularReferences != null) {
+			// 是否允许 Bean 间的循环依赖
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
 	}

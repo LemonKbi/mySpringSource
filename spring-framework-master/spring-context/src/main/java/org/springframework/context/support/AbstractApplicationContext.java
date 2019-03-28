@@ -513,7 +513,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
-		synchronized (this.startupShutdownMonitor) {
+		synchronized (this.startupShutdownMonitor) { // 加锁，防止刷新的一半的时候其他线程进行刷新操作
 			// Prepare this context for refreshing.
 			// 进行环境的准备
 			prepareRefresh();
@@ -527,7 +527,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Prepare the bean factory for use in this context.
 			// 在上下文中准备好beanFacory需要用到的各种环境，注册各种需要的bean
-			// 添加基础的BeanPostProcessors
+			// 添加基础的BeanPostProcessors ApplicationContextAwareProcessor和ApplicationListenerDetector
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -616,7 +616,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Validate that all properties marked as required are resolvable
 		// see ConfigurablePropertyResolver#setRequiredProperties
-		// 验证所有标记为必需的属性都是可解析的
+		// 验证所有标记为必需的属性都是可解析的,校验 xml 配置文件
 		getEnvironment().validateRequiredProperties();
 
 		// Allow for the collection of early ApplicationEvents,
@@ -922,6 +922,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		// 发布context刷新完成事件
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.

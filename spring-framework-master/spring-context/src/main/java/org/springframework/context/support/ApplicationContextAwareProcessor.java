@@ -78,7 +78,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	@Nullable
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		AccessControlContext acc = null;
-
+		// 进行相关aware的处理
 		if (System.getSecurityManager() != null &&
 				(bean instanceof EnvironmentAware || bean instanceof EmbeddedValueResolverAware ||
 						bean instanceof ResourceLoaderAware || bean instanceof ApplicationEventPublisherAware ||
